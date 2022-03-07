@@ -133,9 +133,22 @@ def about():
     return render_template("about.html", current_user=current_user)
 
 
-@app.route("/contact")
+@app.route("/contact",methods=['GET','POST'])
 def contact():
-    return render_template("contact.html", current_user=current_user)
+    form=ContactForm()
+    if form.validate_on_submit():
+        name=form.name.data
+        phone=form.phone.data
+        email=form.email.data
+        message=form.message.data
+        with smtplib.SMTP('smtp.gmail.com',587) as file:
+            file.starttls()
+            file.login(user='enter email here',password='enter password here')
+            file.sendmail(from_addr='email',to_addrs='email',msg=f'Subject:new message\n\nname:{name}'
+                                                                 f'phone number:{phone}'
+                                                                 f'email:{email}'
+                                                                 f'{message}')
+    return render_template("contact.html",form=form, current_user=current_user)
 
 
 @app.route("/new-post", methods=["GET", "POST"])
